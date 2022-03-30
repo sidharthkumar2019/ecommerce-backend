@@ -29,6 +29,11 @@ exports.addCategory = async(req, res) => {
     };
     if (req.body.parentID) obj.parentID = req.body.parentID;
 
+    if (req.file) {
+        obj.categoryImage = process.env.API + '/public/' + req.file.filename;
+    }
+
+    console.log(obj);
     let category = new Category(obj);
     try {
         category = await category.save();   
@@ -36,7 +41,7 @@ exports.addCategory = async(req, res) => {
         return res.status(400).json({error: error.message});
     }
     
-    return res.status(201).json({category});
+    return res.status(201).json(category);
 };
 
 exports.getCategories = async(req, res) => {

@@ -13,7 +13,8 @@ const categorySchema = mongoose.Schema({
     },
     parentID: {
         type: String
-    }
+    },
+    categoryImage: String,
 }, {timestamps: true});
 
 module.exports = mongoose.model('Category', categorySchema);

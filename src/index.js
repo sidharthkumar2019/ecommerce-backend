@@ -2,17 +2,23 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+const path = require('path');
 
 // routes
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin/auth');
 const categoryRoutes = require('./routes/category');
+const productRoutes = require('./routes/product');
+const cartRoutes = require('./routes/cart');
 
 // Configurations
 app.use(express.json());
+app.use('/public', express.static(path.join(__dirname, 'uploads')));
 app.use('/api', authRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', categoryRoutes);
+app.use('/api', productRoutes);
+app.use('/api', cartRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
