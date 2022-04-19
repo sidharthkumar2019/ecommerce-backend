@@ -13,7 +13,8 @@ const createCategoryList = (categories, parentID = null) => {
             _id: ele._id,
             name: ele.name,
             slug: ele.slug,
-            children: createCategoryList(categories, ele._id)
+            children: createCategoryList(categories, ele._id),
+            parentID: ele.parentID
         });
     }
 
