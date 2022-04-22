@@ -56,3 +56,33 @@ exports.getCategories = async(req, res) => {
     const categoryList = createCategoryList(categories);
     res.status(200).json({categoryList});
 };
+
+exports.updateCategories = async(req, res) => {
+    const {_id, name, parentID, type} = req.body;
+    const updatedCategories = [];
+    if (name instanceof Array) {
+        for (let i=0 ; i<name.length ; i++) {
+            const category = {
+                name: name[i],
+                type: type[i]
+            }
+            if (parentID[i] !== '')
+                category.parentID = parentID[i];
+            
+            const updatedCategory = await Category.findOneAndUpdate({_id: _id[i]}, category, {new: true});
+            updatedCategories.push(updatedCategory);
+        }
+        return res.status(201).json({ updatedCategories });
+    }
+    else {
+        const category = {
+            name,
+            type
+        }
+        if (parentID !== '')
+            category.parentID = parentID;
+        
+        const updatedCategory = await Category.findOneAndUpdate({_id}, category, {new: true});
+        return res.status(201).json({updatedCategory});
+    }
+}

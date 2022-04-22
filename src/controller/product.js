@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const slugify = require('slugify');
+const Category = require('../models/category');
 
 exports.addProduct = async(req, res)=> {
     const {
@@ -32,3 +33,39 @@ exports.addProduct = async(req, res)=> {
 
     res.status(201).send(product);
 };
+
+exports.getProductsBySlug = async(req, res) => {
+    const {slug} = req.params;
+    let category;
+    try {
+        category = await Category
+                                .findOne({slug: slug})
+                                .select('_id');
+    } catch (error) {
+        return res.status(400).json({message: error.message});
+    }
+
+    if (!category)
+        return res.status(404).json({ message: 'No such category.' });
+
+    let products;
+    try {
+        products = await Product.find({category: category._id});
+    } catch (error) {
+        return res.status(400).json({message: error.message});
+    }
+
+    if (products.length > 0) {
+        res.status(200).json({
+            products,
+            productsByPrice: {
+                under5k: products.filter(product => product.price < 5000),
+                under10k: products.filter(product => product.price < 10000 && product.price >= 5000),
+                under10k: products.filter(product => product.price < 10000 && product.price >= 5000),
+                under15k: products.filter(product => product.price < 15000 && product.price >= 10000),
+                under20k: products.filter(product => product.price < 20000 && product.price >= 15000),
+                under30k: products.filter(product => product.price < 30000 && product.price >= 20000),
+            }
+        });
+    }
+}
