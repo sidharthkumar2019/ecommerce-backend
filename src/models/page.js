@@ -14,19 +14,20 @@ const pageSchema = mongoose.Schema({
     banners: [
         {
             img: String,
-            navigateTO: String
+            navigateTo: String
         }
     ],
     products: [
         {
             img: String,
-            navigateTO: String
+            navigateTo: String
         }
     ],
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
-        required: true
+        required: true,
+        unique: true
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
