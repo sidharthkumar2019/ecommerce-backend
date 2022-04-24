@@ -12,6 +12,7 @@ const categoryRoutes = require('./routes/category');
 const productRoutes = require('./routes/product');
 const cartRoutes = require('./routes/cart');
 const initialDataRoutes = require('./routes/admin/initialData');
+const pageRoutes = require('./routes/admin/page');
 
 // Configurations
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use('/api', categoryRoutes);
 app.use('/api', productRoutes);
 app.use('/api', cartRoutes);
 app.use('/api', initialDataRoutes);
+app.use('/api', pageRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })

@@ -15,7 +15,8 @@ const createCategoryList = (categories, parentID = null) => {
             name: ele.name,
             slug: ele.slug,
             children: createCategoryList(categories, ele._id),
-            parentID: ele.parentID
+            parentID: ele.parentID,
+            type: ele.type
         });
     }
 
