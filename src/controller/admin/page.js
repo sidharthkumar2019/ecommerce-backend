@@ -6,7 +6,7 @@ exports.createPage = async(req, res) => {
     if (banners.length > 0) {
         req.body.banners = banners.map((banner, index) => {
             return {
-                img: `${process.env.API}/public/${banner.filename}`,
+                img: `/public/${banner.filename}`,
                 navigateTo: `/bannerClicked?categoryID=${req.body.category}&type=${req.body.type}`
             };
         })
@@ -15,7 +15,7 @@ exports.createPage = async(req, res) => {
     if (products.length > 0) {
         req.body.products = products.map((product, index) => {
             return {
-                img: `${process.env.API}/public/${product.filename}`,
+                img: `/public/${product.filename}`,
                 navigateTo: `/productClicked?categoryID=${req.body.category}&type=${req.body.type}`
             };
         })

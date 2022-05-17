@@ -33,7 +33,7 @@ exports.addCategory = async(req, res) => {
     if (req.body.parentID) obj.parentID = req.body.parentID;
 
     if (req.file) {
-        obj.categoryImage = process.env.API + '/public/' + req.file.filename;
+        obj.categoryImage = '/public/' + req.file.filename;
     }
 
     console.log(obj);
