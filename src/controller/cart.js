@@ -97,3 +97,31 @@ exports.getCartItems = async (req, res) => {
         res.status(200).json({ cartItems });
     }
 };
+
+exports.removeCartItems = async (req, res) => {
+    // return res.status(202).json({message: 'Current implementation has some problems'});
+
+    const { productID } = req.body;
+    if (productID) {
+        let result;
+        try {
+            result = await Cart.updateOne(
+                { user: req.user._id },
+                {
+                    $pull: {
+                        cartItems: {
+                            product: productID
+                        },
+                    },
+                }
+            )
+        } catch (error) {
+            return res.status(400).json({message: error.message})
+        }
+        if (result) {
+            res.status(202).json({ result });
+        }
+    }
+    else
+        return res.status(400).json({message: "productID not passed in the request."})
+}

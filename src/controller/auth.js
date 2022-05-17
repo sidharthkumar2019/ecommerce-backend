@@ -2,11 +2,14 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-exports.signup = async(req, res) => {
-    let user = await User.findOne({email: req.body.email});
-    if (user)   return res.status(400).json({message: 'A user with the same email already exists.'});
+const generateJWTToken = (_id, role) => {
+    return jwt.sign({_id, role}, process.env.JWT_SECRET, {expiresIn: '1d'});
+};
 
-    const {firstName, lastName, email, password} = req.body;
+exports.signup = async (req, res) => {
+    let user = await User.findOne({ email: req.body.email });
+    if (user) return res.status(400).json({ message: 'A user with the same email already exists.' });
+    const { firstName, lastName, email, password } = req.body;
     const hash_password = await bcrypt.hash(password, 10);
     user = new User({
         firstName,
@@ -16,22 +19,24 @@ exports.signup = async(req, res) => {
         username: Math.random().toString()
     });
     user = await user.save();
-
-    if (!user) return res.status(400).json({message: 'Something went wrong.'});
-    // else
+    if (!user) return res.status(400).json({ message: 'Something went wrong.' });
+    
+    const token = generateJWTToken(_id, user.role);
     res.status(201).json({
-        message: 'User created successfully'
+        user,
+        token
     });
 };
 
-exports.signin = async(req, res) => {
-    let user = await User.findOne({email: req.body.email});
-    if (!user) return res.status(400).json({message: 'No such user exists'});
+exports.signin = async (req, res) => {
+    let user = await User.findOne({ email: req.body.email });
+    if (!user) return res.status(400).json({ message: 'No such user exists' });
 
-    if (user.authenticate(req.body.password)) {
-        const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1d'});
-        const { _id,firstName, lastName, email, role, fullName} = user;
-        
+    const isPasswordCorrect = await user.authenticate(req.body.password);
+    if (isPasswordCorrect && user.role == 'user') {
+        const { _id, firstName, lastName, email, role, fullName } = user;
+        const token = generateJWTToken(_id, role);
+
         res.status(200).json({
             token,
             user: {
@@ -39,5 +44,5 @@ exports.signin = async(req, res) => {
             }
         });
     }
-    else return res.status(400).json({message: 'Incorrect password'});
+    else return res.status(400).json({ message: 'Incorrect password' });
 }

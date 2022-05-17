@@ -34,7 +34,8 @@ exports.signin = async(req, res) => {
     let user = await User.findOne({email: req.body.email});
     if (!user) return res.status(400).json({message: 'No such user exists'});
 
-    if (user.authenticate(req.body.password) && user.role === 'admin') {
+    const isPasswordCorrect = await user.authenticate(req.body.password);
+    if ( isPasswordCorrect && user.role === 'admin') {
         const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1d'});
         const { _id,firstName, lastName, email, role, fullName} = user;
 

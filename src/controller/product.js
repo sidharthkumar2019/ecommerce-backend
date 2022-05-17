@@ -40,7 +40,7 @@ exports.getProductsBySlug = async (req, res) => {
     try {
         category = await Category
             .findOne({ slug: slug })
-            .select('_id');
+            .select('_id type');
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
@@ -55,9 +55,22 @@ exports.getProductsBySlug = async (req, res) => {
         return res.status(400).json({ message: error.message });
     }
 
+    if (!category.type) {
+        return res.status(200).json({ products });
+
+    }
+
+
     if (products.length > 0) {
         res.status(200).json({
             products,
+            priceRange: {
+                under5k: 5000,
+                under10k: 10000,
+                under15k: 15000,
+                under20k: 20000,
+                under30k: 30000
+            },
             productsByPrice: {
                 under5k: products.filter(product => product.price < 5000),
                 under10k: products.filter(product => product.price < 10000 && product.price >= 5000),
@@ -78,8 +91,7 @@ exports.getProductDetailsById = async (req, res) => {
         try {
             product = await Product.findOne({ _id: productID });
         } catch (error) {
-            console.log(error);
-            return res.status(500).json({error});
+            return res.status(500).json({ error });
         }
 
         if (product)
@@ -90,4 +102,35 @@ exports.getProductDetailsById = async (req, res) => {
     else {
         return res.status(400).json({ error: "Params required" });
     }
+}
+
+exports.deleteProductByID = async (req, res) => {
+    const { productID } = req.body;
+    if (productID) {
+        let product;
+        try {
+            product = await Product.deleteOne({ _id: productID });
+        } catch (error) {
+            return res.status(500).json({ error });
+        }
+        if (product)
+            res.status(202).json({ product });
+        else
+            res.status(400).json({ message: 'No such product found.' });
+    }
+    else
+        return res.status(400).json({ error: "Params required" });
+}
+
+exports.getProducts = async (req, res) => {
+    let products;
+    try {
+        products = await Product.find({});
+    } catch (error) {
+        return res.status(400).json({ error });
+    }
+    if (products)
+        return res.status(200).json({ products });
+    else
+        return res.status(400).json({ message: 'products couldn\'t be obtained.' })
 }
